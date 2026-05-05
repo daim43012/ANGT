@@ -11,12 +11,44 @@ import * as Contracts from "./index.js";
 declare module "@nomicfoundation/hardhat-ethers/types" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
   getContractFactory(name: 'FlyANGT', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.FlyANGT__factory>
+getContractFactory(name: 'MerkleAirdrop', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.MerkleAirdrop__factory>
+getContractFactory(name: 'MockERC20', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.MockERC20__factory>
+getContractFactory(name: 'IERC20', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.IERC20__factory>
+getContractFactory(name: 'Ownable', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.Ownable__factory>
+getContractFactory(name: 'Pausable', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.Pausable__factory>
+getContractFactory(name: 'PresaleTimeWeeks', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.PresaleTimeWeeks__factory>
+getContractFactory(name: 'ReentrancyGuard', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.ReentrancyGuard__factory>
+getContractFactory(name: 'PresaleVestingMerkle', signerOrOptions?: ethers.Signer | FactoryOptions): Promise<Contracts.PresaleVestingMerkle__factory>
 
   getContractAt(name: 'FlyANGT', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.FlyANGT>
+getContractAt(name: 'MerkleAirdrop', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.MerkleAirdrop>
+getContractAt(name: 'MockERC20', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.MockERC20>
+getContractAt(name: 'IERC20', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.IERC20>
+getContractAt(name: 'Ownable', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.Ownable>
+getContractAt(name: 'Pausable', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.Pausable>
+getContractAt(name: 'PresaleTimeWeeks', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.PresaleTimeWeeks>
+getContractAt(name: 'ReentrancyGuard', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.ReentrancyGuard>
+getContractAt(name: 'PresaleVestingMerkle', address: string | ethers.Addressable, signer?: ethers.Signer): Promise<Contracts.PresaleVestingMerkle>
 
   deployContract(name: 'FlyANGT', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.FlyANGT>
+deployContract(name: 'MerkleAirdrop', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MerkleAirdrop>
+deployContract(name: 'MockERC20', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockERC20>
+deployContract(name: 'IERC20', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.IERC20>
+deployContract(name: 'Ownable', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.Ownable>
+deployContract(name: 'Pausable', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.Pausable>
+deployContract(name: 'PresaleTimeWeeks', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.PresaleTimeWeeks>
+deployContract(name: 'ReentrancyGuard', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.ReentrancyGuard>
+deployContract(name: 'PresaleVestingMerkle', signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.PresaleVestingMerkle>
 
   deployContract(name: 'FlyANGT', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.FlyANGT>
+deployContract(name: 'MerkleAirdrop', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MerkleAirdrop>
+deployContract(name: 'MockERC20', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.MockERC20>
+deployContract(name: 'IERC20', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.IERC20>
+deployContract(name: 'Ownable', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.Ownable>
+deployContract(name: 'Pausable', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.Pausable>
+deployContract(name: 'PresaleTimeWeeks', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.PresaleTimeWeeks>
+deployContract(name: 'ReentrancyGuard', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.ReentrancyGuard>
+deployContract(name: 'PresaleVestingMerkle', args: any[], signerOrOptions?: ethers.Signer | DeployContractOptions): Promise<Contracts.PresaleVestingMerkle>
 
     // default types
     getContractFactory(

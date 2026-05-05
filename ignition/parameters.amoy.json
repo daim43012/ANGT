@@ -1,15 +1,15 @@
 {
   "FlyANGTModule": {
-    "treasury": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+    "treasury": "0x8b884b97fD6ff34A2BAd5F96f897ef5C49F92163"
   },
   "MerkleAirdropModule": {
-    "owner": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+    "owner": "0x8b884b97fD6ff34A2BAd5F96f897ef5C49F92163",
     "merkleRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
     "startTime": 0,
     "endTime": 0
   },
   "PresaleVestingModule": {
-    "owner": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+    "owner": "0x8b884b97fD6ff34A2BAd5F96f897ef5C49F92163",
     "merkleRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
     "startTime": 0
   }

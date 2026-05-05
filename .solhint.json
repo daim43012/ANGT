@@ -1,0 +1,8 @@
+{
+  "extends": "solhint:recommended",
+  "rules": {
+    "compiler-version": ["error", "0.8.28"],
+    "no-global-import": "off",
+    "use-natspec": "off"
+  }
+}

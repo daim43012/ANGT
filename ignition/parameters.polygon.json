@@ -1,0 +1,29 @@
+{
+    "FlyANGTModule": {
+        "treasury": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+    },
+    "MerkleAirdropModule": {
+        "owner": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+        "merkleRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "startTime": 0,
+        "endTime": 0
+    },
+    "PresaleModule": {
+        "usdt": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+        "usdc": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+        "treasury": "0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A",
+        "weekDuration": 604800,
+        "pricesMicro": [
+            "10000",
+            "11100",
+            "12200",
+            "13300",
+            "14400",
+            "15600",
+            "16700",
+            "17800",
+            "18900",
+            "20000"
+        ]
+    }
+}
