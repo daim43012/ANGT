@@ -4,12 +4,73 @@
   },
   "MerkleAirdropModule": {
     "owner": "0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A",
-    "merkleRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "merkleRoot": "0x4020c2a512d07e5f3f21b08390c54d5bcdd41e586d5c75a30aa9a10f5ce42ad3",
     "startTime": 0,
     "endTime": 0
   },
   "PresaleVestingModule": {
     "owner": "0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A",
-    "merkleRoot": "0x0000000000000000000000000000000000000000000000000000000000000000"
+    "merkleRoot": "0x22e849df8e7fc8773e9eb3981198d6983a11786455edc788ee63be74f0e23e54"
+  },
+  "AllocationRegistryModule": {
+    "totalSupplyWei": "500000000000000000000000000",
+    "entries": [
+      {
+        "label": "GP #1 (Founder)",
+        "recipient": "0x27c624630fF922Bb675dBFB420C10d745c0f8568",
+        "amountWei": "100000000000000000000000000",
+        "vested": false,
+        "note": "20% — instant transfer at TGE"
+      },
+      {
+        "label": "GP #2 (Founder)",
+        "recipient": "0x9adC93CEA02c5DDF5A8fC0139c79708a5bd8f667",
+        "amountWei": "50000000000000000000000000",
+        "vested": false,
+        "note": "10% — instant transfer at TGE"
+      },
+      {
+        "label": "GP #3 (Founder)",
+        "recipient": "0x4261f9534A92e3f9bb5ec5fD9484eE3f9332Eb3F",
+        "amountWei": "25000000000000000000000000",
+        "vested": false,
+        "note": "5% — instant transfer at TGE"
+      },
+      {
+        "label": "Devs Team",
+        "recipient": "0x59589d7630077f2eCAf1b44A59EDaF12b1100bdb",
+        "amountWei": "25000000000000000000000000",
+        "vested": false,
+        "note": "5% — instant transfer at TGE"
+      },
+      {
+        "label": "Market Makers",
+        "recipient": "0xad98403fe174A46E3E4d0793AF579C23b666EFEd",
+        "amountWei": "12500000000000000000000000",
+        "vested": false,
+        "note": "2.5% — instant transfer at TGE"
+      },
+      {
+        "label": "MerkleAirdrop (contract)",
+        "recipient": "0x0000000000000000000000000000000000000000",
+        "amountWei": "4400000000000000000000",
+        "vested": false,
+        "note": "REPLACE_BEFORE_DEPLOY: actual MerkleAirdrop contract address. 4 400 ANGT for 18 wallets per snapshot 2026-05-06."
+      },
+      {
+        "label": "PresaleVestingMerkle (contract)",
+        "recipient": "0x0000000000000000000000000000000000000000",
+        "amountWei": "162460732408577905774626",
+        "vested": true,
+        "note": "REPLACE_BEFORE_DEPLOY: actual PresaleVestingMerkle contract address. 162 460.732408577905774626 ANGT for 12 wallets per snapshot 2026-05-06, 36mo per-user vesting."
+      },
+      {
+        "label": "Treasury (Safe)",
+        "recipient": "0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A",
+        "amountWei": "287333139267591422094225374",
+        "vested": false,
+        "note": "57.46666% — DEX liquidity, marketing, OTC reserve, future staking rewards"
+      }
+    ]
   }
 }

@@ -27,16 +27,19 @@
 
 ### Распределение supply (500 000 000 ANGT)
 
-| Bucket | % | ANGT | Куда |
-|---|---|---|---|
-| Owner (founder) | 35% | 175 000 000 | один кошелёк, **сразу без vesting** |
-| Devs | 5% | 25 000 000 | один кошелёк, **сразу без vesting** |
-| Market makers | 2.5% | 12 500 000 | один кошелёк, **сразу без vesting** |
-| Airdrop | по snapshot | **4 400** | `MerkleAirdrop` контракт |
-| Presale Vesting | по snapshot | **162 460.7324085779** | `PresaleVestingMerkle` контракт |
-| Treasury / резерв | остаток | ≈ 287 333 138.27 | остаётся на Safe — DEX-листинг, маркетинг, **OTC-резерв** (фондирование `PresaleVestingMerkle` по требованию при `addInvestor*`) |
+| Bucket | % | ANGT | Адрес | Лок |
+|---|---|---|---|---|
+| **GP #1** | 20% | 100 000 000 | `0x27c624630fF922Bb675dBFB420C10d745c0f8568` | без лока |
+| **GP #2** | 10% | 50 000 000 | `0x9adC93CEA02c5DDF5A8fC0139c79708a5bd8f667` | без лока |
+| **GP #3** | 5% | 25 000 000 | `0x4261f9534A92e3f9bb5ec5fD9484eE3f9332Eb3F` | без лока |
+| **Devs Team** | 5% | 25 000 000 | `0x59589d7630077f2eCAf1b44A59EDaF12b1100bdb` | без лока |
+| **Market Makers** | 2.5% | 12 500 000 | `0xad98403fe174A46E3E4d0793AF579C23b666EFEd` | без лока |
+| **MerkleAirdrop** | snapshot | 4 400 | задеплоит ignition | по proof |
+| **PresaleVestingMerkle** | snapshot | 162 460.732408577905774626 | задеплоит ignition | 36 мес per-user |
+| **Treasury (Safe)** | 57.466628…% | 287 333 139.267591422094225374 | `0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A` | без лока |
+| **Сумма** | **100%** | **500 000 000** | | |
 
-GP-кошельки (35 / 5 / 2.5) идут **обычным `transfer` с Safe** без блокировки. Для **прозрачности** TGE-распределение записывается в отдельный read-only `AllocationRegistry` контракт (immutable список `{label, recipient, amountWei, vested, note}`) — любой через Polygonscan видит "Owner — 175M, Devs — 25M, MM — 12.5M, Airdrop — 4 400, Vesting — 162 460.73, Treasury — остаток".
+Treasury — multisig 3-x GP-подписей (`0x27c…`, `0x9adC…`, `0x4261…`). Все будущие операции (DEX-доливка, OTC-фондирование `PresaleVestingMerkle`, маркетинг, staking-rewards) идут с него. Для **прозрачности** распределение записано в `AllocationRegistry` — любой через Polygonscan видит весь breakdown.
 
 ### ⬜ Не готово / нужно сделать
 
@@ -280,6 +283,21 @@ ignition/modules/PresaleModule.ts    → старый Presale (не исполь
 `merkleRoot=0x00…00` — placeholder. Реальный root устанавливается **после** деплоя через `setMerkleRoot(...)` (всё равно owner = Safe). Альтернатива — пересохранить `parameters.polygon.json` с реальным root перед деплоем и задеплоить уже с ним.
 
 ---
+
+## 5.1. Адреса для распределения TGE (финал)
+
+```
+GP #1 wallet:  0x27c624630fF922Bb675dBFB420C10d745c0f8568   100 000 000 ANGT (20%)
+GP #2 wallet:  0x9adC93CEA02c5DDF5A8fC0139c79708a5bd8f667    50 000 000 ANGT (10%)
+GP #3 wallet:  0x4261f9534A92e3f9bb5ec5fD9484eE3f9332Eb3F    25 000 000 ANGT (5%)
+Devs:          0x59589d7630077f2eCAf1b44A59EDaF12b1100bdb    25 000 000 ANGT (5%)
+Market Makers: 0xad98403fe174A46E3E4d0793AF579C23b666EFEd    12 500 000 ANGT (2.5%)
+Treasury Safe: 0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A   287 333 139.267591422094225374 ANGT
+MerkleAirdrop: <after deploy>                                          4 400 ANGT
+PresaleVesting:<after deploy>                            162 460.732408577905774626 ANGT
+                                                          ──────────────────────────
+                                                               500 000 000 ANGT
+```
 
 ## 6. Порядок деплоя на Polygon mainnet
 
