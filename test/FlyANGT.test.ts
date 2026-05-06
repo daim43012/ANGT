@@ -1,56 +1,64 @@
 import { expect } from "chai";
 import { network } from "hardhat";
 
+const E18 = 10n ** 18n;
+const TOTAL_SUPPLY = 500_000_000n * E18;
+
 describe("FlyANGT", function () {
-  it("deploy: should mint total supply to treasury and set correct metadata", async function () {
+  async function deployFixture() {
     const { ethers } = await network.connect();
+    const [deployer, treasury, other] = await ethers.getSigners();
 
-    const [deployer, treasury] = await ethers.getSigners();
+    const Token = await ethers.getContractFactory("FlyANGT", deployer);
+    const token: any = await Token.deploy(treasury.address);
 
-    const FlyANGT = await ethers.getContractFactory("FlyANGT", deployer);
-    const token = await FlyANGT.deploy(treasury.address);
+    return { ethers, deployer, treasury, other, token };
+  }
 
+  it("constructor: name/symbol/decimals", async function () {
+    const { token } = await deployFixture();
     expect(await token.name()).to.equal("FlyANGT");
     expect(await token.symbol()).to.equal("ANGT");
     expect(await token.decimals()).to.equal(18);
-
-    const expected = ethers.parseUnits("200000000", 18);
-    expect(await token.totalSupply()).to.equal(expected);
-    expect(await token.balanceOf(treasury.address)).to.equal(expected);
-
-    // owner = deployer (как в твоём constructor Ownable(msg.sender))
-    expect(await token.owner()).to.equal(deployer.address);
   });
 
-  it("deploy: should revert if treasury is zero address", async function () {
-    const { ethers } = await network.connect();
-
-    const FlyANGT = await ethers.getContractFactory("FlyANGT");
-    await expect(FlyANGT.deploy(ethers.ZeroAddress)).to.be.revertedWith(
-      "treasury is zero"
-    );
+  it("constructor: total supply == 500M, all minted to treasury", async function () {
+    const { token, treasury } = await deployFixture();
+    expect(await token.TOTAL_SUPPLY()).to.equal(TOTAL_SUPPLY);
+    expect(await token.totalSupply()).to.equal(TOTAL_SUPPLY);
+    expect(await token.balanceOf(treasury.address)).to.equal(TOTAL_SUPPLY);
   });
 
-  it("transfer: should transfer tokens from treasury to another account", async function () {
-    const { ethers } = await network.connect();
+  it("constructor: owner == treasury, NOT deployer", async function () {
+    const { token, treasury, deployer } = await deployFixture();
+    expect(await token.owner()).to.equal(treasury.address);
+    expect(await token.owner()).to.not.equal(deployer.address);
+  });
 
-    const [, treasury, receiver] = await ethers.getSigners();
+  it("constructor: reverts on zero treasury (OZ Ownable runs first)", async function () {
+    const { ethers } = await deployFixture();
+    const Token = await ethers.getContractFactory("FlyANGT");
+    // OZ Ownable's Ownable(address(0)) check fires before our require.
+    await expect(Token.deploy(ethers.ZeroAddress))
+      .to.be.revertedWithCustomError(Token, "OwnableInvalidOwner")
+      .withArgs(ethers.ZeroAddress);
+  });
 
-    const FlyANGT = await ethers.getContractFactory("FlyANGT");
-    const token = await FlyANGT.deploy(treasury.address);
-
-    const amount = ethers.parseUnits("1000", 18);
-
-    const treasuryBefore = await token.balanceOf(treasury.address);
-    const receiverBefore = await token.balanceOf(receiver.address);
-
-    await token.connect(treasury).transfer(receiver.address, amount);
-
-    expect(await token.balanceOf(receiver.address)).to.equal(
-      receiverBefore + amount
-    );
+  it("transfer: works between accounts", async function () {
+    const { token, treasury, other } = await deployFixture();
+    await token.connect(treasury).transfer(other.address, 100n * E18);
+    expect(await token.balanceOf(other.address)).to.equal(100n * E18);
     expect(await token.balanceOf(treasury.address)).to.equal(
-      treasuryBefore - amount
+      TOTAL_SUPPLY - 100n * E18,
     );
+  });
+
+  it("transferOwnership: only owner (=treasury) can call", async function () {
+    const { token, treasury, other, deployer } = await deployFixture();
+    await expect(token.connect(deployer).transferOwnership(other.address))
+      .to.be.revertedWithCustomError(token, "OwnableUnauthorizedAccount")
+      .withArgs(deployer.address);
+    await token.connect(treasury).transferOwnership(other.address);
+    expect(await token.owner()).to.equal(other.address);
   });
 });

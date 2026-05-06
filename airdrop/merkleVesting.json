@@ -1,0 +1,121 @@
+{
+  "root": "0x22e849df8e7fc8773e9eb3981198d6983a11786455edc788ee63be74f0e23e54",
+  "proofs": {
+    "0x17322799879AbaeD224Ba5f923Df790B439567AB": {
+      "amount": "50",
+      "amountWei": "50000000000000000000",
+      "proof": [
+        "0x8188e91ca60658e93f81b711228d3f801305eed5cae3e03ad9597409254bd812",
+        "0x75373d5057208ae9d0ff0d1c9a0312716b5c11a19aaf77830aecfeaaf585c3ca",
+        "0xe1510de8e3b1e19968657bba9b422df1d9bd394ffda4f964bd8819c478d5d2af",
+        "0xf408a038d719cf8546df52a8a9283fbc069ad3840853faeec04106c10693be9b"
+      ]
+    },
+    "0x22016ADfc5f2FEE0fc5046Db84B3d50E99952566": {
+      "amount": "30",
+      "amountWei": "30000000000000000000",
+      "proof": [
+        "0xfc71e9082889a39e412298a307d675b13638e696e8c1419c27d7bdbf7f43d76e",
+        "0x75373d5057208ae9d0ff0d1c9a0312716b5c11a19aaf77830aecfeaaf585c3ca",
+        "0xe1510de8e3b1e19968657bba9b422df1d9bd394ffda4f964bd8819c478d5d2af",
+        "0xf408a038d719cf8546df52a8a9283fbc069ad3840853faeec04106c10693be9b"
+      ]
+    },
+    "0x59589d7630077f2eCAf1b44A59EDaF12b1100bdb": {
+      "amount": "36.3115",
+      "amountWei": "36311500000000000000",
+      "proof": [
+        "0xdbccbaf5669bb5a32f5e5e3a5db8d0051db01c9be32ea49489240a19065b7157",
+        "0x64741ea3eaa1309332ba563c9e5760ff533d2c9fb48a209bc8f9d81cf8001a10",
+        "0xe1510de8e3b1e19968657bba9b422df1d9bd394ffda4f964bd8819c478d5d2af",
+        "0xf408a038d719cf8546df52a8a9283fbc069ad3840853faeec04106c10693be9b"
+      ]
+    },
+    "0x65a187B135Ca95355ccf1b8Fe096137593E41A9F": {
+      "amount": "90.09009009009009009",
+      "amountWei": "90090090090090090090",
+      "proof": [
+        "0x232536ffdf9809987b3b0f84ab7063a97d2e3dde8e572e96c4bd49c6eb3df444",
+        "0x64741ea3eaa1309332ba563c9e5760ff533d2c9fb48a209bc8f9d81cf8001a10",
+        "0xe1510de8e3b1e19968657bba9b422df1d9bd394ffda4f964bd8819c478d5d2af",
+        "0xf408a038d719cf8546df52a8a9283fbc069ad3840853faeec04106c10693be9b"
+      ]
+    },
+    "0x8935Ab2fECc02F08A6139941f114cE7C6f40fa6C": {
+      "amount": "45045.045045045045045045",
+      "amountWei": "45045045045045045045045",
+      "proof": [
+        "0x35e4c94350caeb080f2de4741a0313c097b62c609475954e63a6cde135bfaf25",
+        "0x245bcefac1a12c2e6c88cb1995ca2086f52b6d65632618e05040c3ea0245a71f",
+        "0x38eb6e3825a10e6d6fcb9eb9481f7db5ac48eaf804e4b736c19c8e98a22cb67b",
+        "0xf408a038d719cf8546df52a8a9283fbc069ad3840853faeec04106c10693be9b"
+      ]
+    },
+    "0x9adC93CEA02c5DDF5A8fC0139c79708a5bd8f667": {
+      "amount": "10000",
+      "amountWei": "10000000000000000000000",
+      "proof": [
+        "0x252950ab0ab009589f1b0a2b6ad4061e81a7c6afcf6ab0ad0034c8958a6f2d95",
+        "0x245bcefac1a12c2e6c88cb1995ca2086f52b6d65632618e05040c3ea0245a71f",
+        "0x38eb6e3825a10e6d6fcb9eb9481f7db5ac48eaf804e4b736c19c8e98a22cb67b",
+        "0xf408a038d719cf8546df52a8a9283fbc069ad3840853faeec04106c10693be9b"
+      ]
+    },
+    "0xE501395f13Ff74e7B243e14a2ab7ba2e44Ee4B05": {
+      "amount": "100000",
+      "amountWei": "100000000000000000000000",
+      "proof": [
+        "0xf64c09b479d65060ac492a84310eacee57c4e9d45289a7edcb171d0546f6dfea",
+        "0x42f167b2f92e28e81a22e08f61540ce8c017a265579774bb862daf563d8fcc0d",
+        "0x38eb6e3825a10e6d6fcb9eb9481f7db5ac48eaf804e4b736c19c8e98a22cb67b",
+        "0xf408a038d719cf8546df52a8a9283fbc069ad3840853faeec04106c10693be9b"
+      ]
+    },
+    "0xa316515a481CdC3A96364a351851CCF20D752cf9": {
+      "amount": "50",
+      "amountWei": "50000000000000000000",
+      "proof": [
+        "0x1656561dde8dedceec185db151e5b3e2857544d3986e63dbd302d07d15fe56cd",
+        "0x42f167b2f92e28e81a22e08f61540ce8c017a265579774bb862daf563d8fcc0d",
+        "0x38eb6e3825a10e6d6fcb9eb9481f7db5ac48eaf804e4b736c19c8e98a22cb67b",
+        "0xf408a038d719cf8546df52a8a9283fbc069ad3840853faeec04106c10693be9b"
+      ]
+    },
+    "0xaDc3542BEEA8b2c7eCc0905b674d3840068db077": {
+      "amount": "73.770491622950819672",
+      "amountWei": "73770491622950819672",
+      "proof": [
+        "0xb6c26745edf1ce41b0d671e18f28e8bc47b227eeec86fa12f55d3223ab58ea97",
+        "0xd86dd51c4256c3d0fc9775cd60702f4845d582083fb37adf1822471c360a6ede",
+        "0x9e9359662e6eda5a592d616b592b58cc06736f4e661ba1359ccdb5b430e3d2c7"
+      ]
+    },
+    "0xad98403fe174A46E3E4d0793AF579C23b666EFEd": {
+      "amount": "2443.171019819819819819",
+      "amountWei": "2443171019819819819819",
+      "proof": [
+        "0xc4afc1cc3a5b65bfa2b62f2f14a518184aa3b82ba625afed607cdd5c4ae91085",
+        "0xd86dd51c4256c3d0fc9775cd60702f4845d582083fb37adf1822471c360a6ede",
+        "0x9e9359662e6eda5a592d616b592b58cc06736f4e661ba1359ccdb5b430e3d2c7"
+      ]
+    },
+    "0xf0D7D8708D6e1A28FCE5b65926ffA910aeAEbaBc": {
+      "amount": "1639.344262",
+      "amountWei": "1639344262000000000000",
+      "proof": [
+        "0x419a046bbf9c4a3f8b29eb93193893a04da1a9b23d30f5a4b2c35bba5986bb4c",
+        "0x0f466bdf2f22d238fbf502f41fdc4fde045ed1f951f2ebbde5b1306568d7155e",
+        "0x9e9359662e6eda5a592d616b592b58cc06736f4e661ba1359ccdb5b430e3d2c7"
+      ]
+    },
+    "0xf36b3B7Ff4d32fE44B3755e4459B9d38EEf1de7E": {
+      "amount": "3003",
+      "amountWei": "3003000000000000000000",
+      "proof": [
+        "0xced8ca27b35e80c97c94dcaca5b2bc389f7de24f21c379b10555e97a110bf43f",
+        "0x0f466bdf2f22d238fbf502f41fdc4fde045ed1f951f2ebbde5b1306568d7155e",
+        "0x9e9359662e6eda5a592d616b592b58cc06736f4e661ba1359ccdb5b430e3d2c7"
+      ]
+    }
+  }
+}

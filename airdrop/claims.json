@@ -1,18 +1,74 @@
 [
   {
-    "address": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-    "amount": "4445"
+    "address": "0x9adC93CEA02c5DDF5A8fC0139c79708a5bd8f667",
+    "amount": "675"
   },
   {
-    "address": "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
-    "amount": "5555"
+    "address": "0xE501395f13Ff74e7B243e14a2ab7ba2e44Ee4B05",
+    "amount": "575"
   },
   {
-    "address": "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc",
-    "amount": "6666"
+    "address": "0xad98403fe174A46E3E4d0793AF579C23b666EFEd",
+    "amount": "425"
   },
   {
-    "address": "0x8b884b97fD6ff34A2BAd5F96f897ef5C49F92163",
-    "amount": "7777"
+    "address": "0x17322799879AbaeD224Ba5f923Df790B439567AB",
+    "amount": "425"
+  },
+  {
+    "address": "0x8935Ab2fECc02F08A6139941f114cE7C6f40fa6C",
+    "amount": "325"
+  },
+  {
+    "address": "0x65a187B135Ca95355ccf1b8Fe096137593E41A9F",
+    "amount": "275"
+  },
+  {
+    "address": "0xf0D7D8708D6e1A28FCE5b65926ffA910aeAEbaBc",
+    "amount": "225"
+  },
+  {
+    "address": "0x7B4106e85B91e6701A0eC8368aBF98b31faCe415",
+    "amount": "225"
+  },
+  {
+    "address": "0x197141C742fDaa5B8fAF75B28F7925Ba734fc0ed",
+    "amount": "225"
+  },
+  {
+    "address": "0x4Fe6d3B7f2dBACD941D8Cfe44753BE06148bf641",
+    "amount": "225"
+  },
+  {
+    "address": "0x3AB9c52F93184a016e252F49FE7C0b05D023a882",
+    "amount": "225"
+  },
+  {
+    "address": "0xa316515a481CdC3A96364a351851CCF20D752cf9",
+    "amount": "175"
+  },
+  {
+    "address": "0x9E216de999c1B2e76ddF0929130441344145d30b",
+    "amount": "150"
+  },
+  {
+    "address": "0x603fC88774c1A89e37793062dFF928Dfc8Eb678b",
+    "amount": "50"
+  },
+  {
+    "address": "0x7Dc734470764d64Efc4FED9Ec745b5E84692582b",
+    "amount": "50"
+  },
+  {
+    "address": "0xaDc3542BEEA8b2c7eCc0905b674d3840068db077",
+    "amount": "50"
+  },
+  {
+    "address": "0xDE0e050e2Ee1E76F41304F34F964F10683F383A9",
+    "amount": "50"
+  },
+  {
+    "address": "0x2869177A59B5267543c7dDdA6C53Ab3DEa0652da",
+    "amount": "50"
   }
 ]

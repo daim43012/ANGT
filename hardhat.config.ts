@@ -28,15 +28,15 @@ export default defineConfig({
     amoy: {
       type: "http",
       chainType: "l1",
-      url: process.env.AMOY_RPC_URL!,
-      accounts: [process.env.AMOY_PRIVATE_KEY!],
+      url: configVariable("AMOY_RPC_URL"),
+      accounts: [configVariable("AMOY_PRIVATE_KEY")],
     },
 
     polygon: {
       type: "http",
       chainType: "l1",
-      url: process.env.POLYGON_RPC_URL!,
-      accounts: [process.env.POLYGON_PRIVATE_KEY!],
+      url: configVariable("POLYGON_RPC_URL"),
+      accounts: [configVariable("POLYGON_PRIVATE_KEY")],
     },
   },
 });

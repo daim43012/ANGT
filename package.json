@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "claims:airdrop": "tsx scripts/generateAirdropClaims.ts",
+    "claims:presale": "tsx scripts/generatePresaleClaims.ts",
+    "merkle:airdrop": "tsx scripts/buildMerkle.ts",
+    "merkle:presale": "tsx scripts/buildMerkleVesting.ts",
+    "deploy:local-presale": "tsx scripts/deploy-local-presale.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +23,7 @@
     "@types/chai-as-promised": "^8.0.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.19.8",
+    "@types/pg": "^8.11.10",
     "chai": "^5.3.3",
     "ethers": "^6.16.0",
     "forge-std": "github:foundry-rs/forge-std#v1.9.4",
@@ -31,6 +38,7 @@
     "@openzeppelin/contracts": "^5.4.0",
     "dotenv": "^17.2.3",
     "keccak256": "^1.0.6",
-    "merkletreejs": "^0.6.0"
+    "merkletreejs": "^0.6.0",
+    "pg": "^8.13.0"
   }
 }
