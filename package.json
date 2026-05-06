@@ -9,7 +9,8 @@
     "claims:presale": "tsx scripts/generatePresaleClaims.ts",
     "merkle:airdrop": "tsx scripts/buildMerkle.ts",
     "merkle:presale": "tsx scripts/buildMerkleVesting.ts",
-    "safe:tge-batch": "tsx scripts/buildSafeBatch.ts",
+    "safe:distribution": "tsx scripts/buildSafeBatch.ts",
+    "safe:activate": "tsx scripts/buildSafeBatchActivate.ts",
     "deploy:local-presale": "tsx scripts/deploy-local-presale.ts"
   },
   "keywords": [],

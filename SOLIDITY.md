@@ -34,12 +34,17 @@
 | **GP #3** | 5% | 25 000 000 | `0x4261f9534A92e3f9bb5ec5fD9484eE3f9332Eb3F` | без лока |
 | **Devs Team** | 5% | 25 000 000 | `0x59589d7630077f2eCAf1b44A59EDaF12b1100bdb` | без лока |
 | **Market Makers** | 2.5% | 12 500 000 | `0xad98403fe174A46E3E4d0793AF579C23b666EFEd` | без лока |
-| **MerkleAirdrop** | snapshot | 4 400 | задеплоит ignition | по proof |
-| **PresaleVestingMerkle** | snapshot | 162 460.732408577905774626 | задеплоит ignition | 36 мес per-user |
-| **Treasury (Safe)** | 57.466628…% | 287 333 139.267591422094225374 | `0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A` | без лока |
+| **Treasury (Safe)** | 57.5% | 287 500 000 | `0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A` | multisig 3-х GP |
 | **Сумма** | **100%** | **500 000 000** | | |
 
-Treasury — multisig 3-x GP-подписей (`0x27c…`, `0x9adC…`, `0x4261…`). Все будущие операции (DEX-доливка, OTC-фондирование `PresaleVestingMerkle`, маркетинг, staking-rewards) идут с него. Для **прозрачности** распределение записано в `AllocationRegistry` — любой через Polygonscan видит весь breakdown.
+Treasury (`0xBBC7Ee…490A`) — Safe multisig 3-x GP-подписей (`0x27c…`, `0x9adC…`, `0x4261…`). Из 287.5M на Safe позже отдельными транзакциями расходуется:
+- **4 400 ANGT** → `MerkleAirdrop` контракт (когда открываешь airdrop-клейм)
+- **~162 460.73 ANGT + OTC резерв** → `PresaleVestingMerkle` контракт (когда открываешь vesting-клейм)
+- **DEX-ликвидность** (Uniswap, QuickSwap)
+- **Маркетинг / партнёрства**
+- **Staking-rewards / liquidity-mining** (когда задеплоишь staking-контракт)
+
+`AllocationRegistry` фиксирует **только TGE-распределение** (GP/Dev/MM/Treasury). Дальнейшие переводы с Treasury видны как обычные ERC20 Transfer events на Polygonscan.
 
 ### ⬜ Не готово / нужно сделать
 

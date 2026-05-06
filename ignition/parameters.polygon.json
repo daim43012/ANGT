@@ -51,25 +51,11 @@
         "note": "2.5% — instant transfer at TGE"
       },
       {
-        "label": "MerkleAirdrop (contract)",
-        "recipient": "0x0000000000000000000000000000000000000000",
-        "amountWei": "4400000000000000000000",
-        "vested": false,
-        "note": "REPLACE_BEFORE_DEPLOY: actual MerkleAirdrop contract address. 4 400 ANGT for 18 wallets per snapshot 2026-05-06."
-      },
-      {
-        "label": "PresaleVestingMerkle (contract)",
-        "recipient": "0x0000000000000000000000000000000000000000",
-        "amountWei": "162460732408577905774626",
-        "vested": true,
-        "note": "REPLACE_BEFORE_DEPLOY: actual PresaleVestingMerkle contract address. 162 460.732408577905774626 ANGT for 12 wallets per snapshot 2026-05-06, 36mo per-user vesting."
-      },
-      {
         "label": "Treasury (Safe)",
         "recipient": "0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A",
-        "amountWei": "287333139267591422094225374",
+        "amountWei": "287500000000000000000000000",
         "vested": false,
-        "note": "57.46666% — DEX liquidity, marketing, OTC reserve, future staking rewards"
+        "note": "57.5% — multisig of 3 GPs. Holds airdrop/vesting funds (sent to contracts later), DEX liquidity, marketing, OTC reserve, future staking rewards"
       }
     ]
   }
