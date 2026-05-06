@@ -44,4 +44,9 @@ export default defineConfig({
     },
   },
   networks,
+  verify: {
+    etherscan: {
+      apiKey: process.env.POLYGONSCAN_API_KEY ?? "",
+    },
+  },
 });
