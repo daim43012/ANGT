@@ -295,7 +295,11 @@ describe("PresaleVestingMerkle", function () {
   });
 
   it("claim: pays out claimable, advances claimed counter", async function () {
-    const { ethers, vesting, treasury, carol, token } = await fixture();
+    const { ethers, vesting, treasury, carol, root, token } = await fixture();
+    // Owner must set root and start() before any claims work.
+    await vesting.connect(treasury).setMerkleRoot(root);
+    await vesting.connect(treasury).start();
+
     await vesting.connect(treasury).addInvestorHuman(carol.address, 3600n);
 
     await increaseBy(ethers, MONTH);
@@ -313,7 +317,10 @@ describe("PresaleVestingMerkle", function () {
   });
 
   it("claim: top-up after claim immediately makes vested portion claimable", async function () {
-    const { ethers, vesting, treasury, carol, token } = await fixture();
+    const { ethers, vesting, treasury, carol, root, token } = await fixture();
+    await vesting.connect(treasury).setMerkleRoot(root);
+    await vesting.connect(treasury).start();
+
     await vesting.connect(treasury).addInvestorHuman(carol.address, 360n); // 360 ANGT
     await increaseBy(ethers, MONTH * 6); // 6 months
     await vesting.connect(carol).claim();
