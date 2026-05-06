@@ -1,6 +1,36 @@
 import "dotenv/config";
 import hardhatToolboxMochaEthersPlugin from "@nomicfoundation/hardhat-toolbox-mocha-ethers";
-import { configVariable, defineConfig } from "hardhat/config";
+import { defineConfig } from "hardhat/config";
+
+// Network configs are added conditionally — `compile` and `test` work without
+// any env vars. For deploy on a network, set the corresponding RPC + private key
+// in .env (see .env.example).
+
+const networks: Record<string, any> = {
+  localhost: {
+    type: "http",
+    chainType: "l1",
+    url: "http://127.0.0.1:8545",
+  },
+};
+
+if (process.env.POLYGON_RPC_URL && process.env.POLYGON_PRIVATE_KEY) {
+  networks.polygon = {
+    type: "http",
+    chainType: "l1",
+    url: process.env.POLYGON_RPC_URL,
+    accounts: [process.env.POLYGON_PRIVATE_KEY],
+  };
+}
+
+if (process.env.AMOY_RPC_URL && process.env.AMOY_PRIVATE_KEY) {
+  networks.amoy = {
+    type: "http",
+    chainType: "l1",
+    url: process.env.AMOY_RPC_URL,
+    accounts: [process.env.AMOY_PRIVATE_KEY],
+  };
+}
 
 export default defineConfig({
   plugins: [hardhatToolboxMochaEthersPlugin],
@@ -13,30 +43,5 @@ export default defineConfig({
       },
     },
   },
-  networks: {
-    localhost: {
-      type: "http",
-      chainType: "l1",
-      url: "http://127.0.0.1:8545",
-    },
-    sepolia: {
-      type: "http",
-      chainType: "l1",
-      url: configVariable("SEPOLIA_RPC_URL"),
-      accounts: [configVariable("SEPOLIA_PRIVATE_KEY")],
-    },
-    amoy: {
-      type: "http",
-      chainType: "l1",
-      url: configVariable("AMOY_RPC_URL"),
-      accounts: [configVariable("AMOY_PRIVATE_KEY")],
-    },
-
-    polygon: {
-      type: "http",
-      chainType: "l1",
-      url: configVariable("POLYGON_RPC_URL"),
-      accounts: [configVariable("POLYGON_PRIVATE_KEY")],
-    },
-  },
+  networks,
 });
