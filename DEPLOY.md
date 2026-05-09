@@ -143,7 +143,7 @@ Treasury keeps:    287500000 ANGT
 
 Делается **когда захочешь** — через час, день, неделю. Никакой срочности.
 
-### 2.1. Деплой MerkleAirdrop и PresaleVestingMerkle
+### 2.1. Деплой MerkleAirdrop и Vesting
 
 ```bash
 npx hardhat ignition deploy ignition/modules/MerkleAirdrop.ts \
@@ -176,7 +176,7 @@ npm run safe:activate
 Создастся `airdrop/safe-batch-activate.json` с 6 операциями:
 ```
 1. transfer 4 400 ANGT (точно по snapshot) → MerkleAirdrop
-2. transfer 162 460.7324… + 10M резерв → PresaleVestingMerkle
+2. transfer 162 460.7324… + 10M резерв → Vesting
 3. setMerkleRoot 0x4020c2a5… → MerkleAirdrop
 4. setMerkleRoot 0x22e849df… → PresaleVesting
 5. start() → MerkleAirdrop  (морозит root, открывает claim)

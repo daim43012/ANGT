@@ -2,7 +2,7 @@
 pragma solidity 0.8.28;
 
 /**
- * PresaleVestingMerkle
+ * Vesting
  *
  * Hybrid vesting vault for presale & OTC allocations with PER-USER vesting clock.
  *
@@ -29,7 +29,7 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract PresaleVestingMerkle is Ownable, ReentrancyGuard {
+contract Vesting is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     // -------------------------

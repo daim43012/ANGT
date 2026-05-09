@@ -36,7 +36,7 @@ async function increaseBy(ethers: any, seconds: number) {
   await ethers.provider.send("evm_mine", []);
 }
 
-describe("PresaleVestingMerkle", function () {
+describe("Vesting", function () {
   async function fixture() {
     const { ethers } = await network.connect();
     const [deployer, treasury, alice, bob, carol, eve] =
@@ -53,7 +53,7 @@ describe("PresaleVestingMerkle", function () {
     const { tree, root } = buildTree(claims);
 
     const Vesting = await ethers.getContractFactory(
-      "PresaleVestingMerkle",
+      "Vesting",
       deployer,
     );
     const vesting: any = await Vesting.deploy(

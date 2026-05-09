@@ -68,7 +68,7 @@ describe("AllocationRegistry", function () {
         recipient: addrs.vesting,
         amountWei: parts.vesting,
         vested: true,
-        note: "PresaleVestingMerkle, 36mo per-user",
+        note: "Vesting, 36mo per-user",
       },
       {
         label: "Treasury",

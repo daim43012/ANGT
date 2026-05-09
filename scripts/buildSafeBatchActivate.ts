@@ -4,16 +4,16 @@
  * Use this LATER, after the initial distribution is done and you're ready to
  * open claims for users. Sequence:
  *   1. transfer ANGT from Safe → MerkleAirdrop (snapshot total)
- *   2. transfer ANGT from Safe → PresaleVestingMerkle (snapshot total + optional OTC reserve)
+ *   2. transfer ANGT from Safe → Vesting (snapshot total + optional OTC reserve)
  *   3. setMerkleRoot(root) on both
  *   4. start() on both
  *
- * Run AFTER MerkleAirdrop and PresaleVestingMerkle are deployed.
+ * Run AFTER MerkleAirdrop and Vesting are deployed.
  *
  * Env:
  *   ANGT_ADDRESS    — deployed FlyANGT
  *   AIRDROP_ADDRESS — deployed MerkleAirdrop
- *   VESTING_ADDRESS — deployed PresaleVestingMerkle
+ *   VESTING_ADDRESS — deployed Vesting
  *   SAFE_ADDRESS    — Safe (treasury), default 0xBBC7Ee...490A
  *   VESTING_RESERVE — optional extra ANGT (whole tokens) for OTC top-ups, default 0
  *
@@ -134,7 +134,7 @@ const batch = {
   createdAt: Date.now(),
   meta: {
     name: "FlyANGT — airdrop & vesting activation",
-    description: `Fund and activate MerkleAirdrop (${airdropTotalWei} wei) and PresaleVestingMerkle (${vestingFundingWei} wei = snapshot ${vestingTotalWei} + OTC reserve ${VESTING_RESERVE_TOKENS} ANGT).`,
+    description: `Fund and activate MerkleAirdrop (${airdropTotalWei} wei) and Vesting (${vestingFundingWei} wei = snapshot ${vestingTotalWei} + OTC reserve ${VESTING_RESERVE_TOKENS} ANGT).`,
     txBuilderVersion: "1.16.0",
     createdFromSafeAddress: SAFE,
   },

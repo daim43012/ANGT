@@ -1,5 +1,5 @@
 /**
- * Tests for the new fundAndAddInvestor* functions on PresaleVestingMerkle.
+ * Tests for the new fundAndAddInvestor* functions on Vesting.
  *
  * These atomically (1) pull tokens from the owner via transferFrom (requires
  * a prior ERC20 approve from the owner to this contract) and (2) credit the
@@ -33,7 +33,7 @@ async function increaseBy(ethers: any, seconds: number) {
   await ethers.provider.send("evm_mine", []);
 }
 
-describe("PresaleVestingMerkle — fundAndAddInvestor*", function () {
+describe("Vesting — fundAndAddInvestor*", function () {
   /**
    * In this fixture treasury is BOTH the owner of the vesting contract AND
    * the token holder funding it. Vesting is deployed empty; no presale-fill
@@ -48,7 +48,7 @@ describe("PresaleVestingMerkle — fundAndAddInvestor*", function () {
     const token: any = await Token.deploy(treasury.address);
 
     const Vesting = await ethers.getContractFactory(
-      "PresaleVestingMerkle",
+      "Vesting",
       deployer,
     );
     const vesting: any = await Vesting.deploy(

@@ -4,7 +4,7 @@
  * Reads:  airdrop/claimsVesting.json — [{ address, amount }] (amount = human ANGT, may be fractional)
  * Writes: airdrop/merkleVesting.json — { root, proofs }
  *
- * Leaf encoding matches PresaleVestingMerkle.activateMerkle:
+ * Leaf encoding matches Vesting.activateMerkle:
  *   keccak256(abi.encodePacked(address, totalAllocationAmountWei))
  *
  * Run:

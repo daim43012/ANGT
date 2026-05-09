@@ -7,7 +7,7 @@ const PresaleVestingModule = buildModule("PresaleVestingModule", (m) => {
   const owner = m.getParameter("owner");
   const merkleRoot = m.getParameter("merkleRoot");
 
-  const vesting = m.contract("PresaleVestingMerkle", [
+  const vesting = m.contract("Vesting", [
     token,
     merkleRoot,
     owner,
