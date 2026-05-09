@@ -163,6 +163,43 @@ contract PresaleVestingMerkle is Ownable, ReentrancyGuard {
     }
 
     // -------------------------
+    // Admin: fund + add atomically (one tx for OTC sales)
+    // -------------------------
+    /// @notice Pull `amountWei` ANGT from owner (Safe) into this contract AND
+    ///         credit `account` via _addInvestor — in a single onlyOwner call.
+    /// @dev Requires the caller (owner) to have ERC20-approved this contract
+    ///      to spend `amountWei` (or more) of `token`.
+    function fundAndAddInvestorWei(address account, uint256 amountWei) public onlyOwner {
+        token.safeTransferFrom(msg.sender, address(this), amountWei);
+        _addInvestor(account, amountWei);
+        emit Funded(msg.sender, amountWei);
+    }
+
+    function fundAndAddInvestorHuman(address account, uint256 amountTokens) external onlyOwner {
+        fundAndAddInvestorWei(account, amountTokens * DECIMALS);
+    }
+
+    function fundAndAddInvestorsWei(
+        address[] calldata accounts,
+        uint256[] calldata amountsWei
+    ) external onlyOwner {
+        require(accounts.length == amountsWei.length, "len mismatch");
+        for (uint256 i = 0; i < accounts.length; i++) {
+            fundAndAddInvestorWei(accounts[i], amountsWei[i]);
+        }
+    }
+
+    function fundAndAddInvestorsHuman(
+        address[] calldata accounts,
+        uint256[] calldata amountTokens
+    ) external onlyOwner {
+        require(accounts.length == amountTokens.length, "len mismatch");
+        for (uint256 i = 0; i < accounts.length; i++) {
+            fundAndAddInvestorWei(accounts[i], amountTokens[i] * DECIMALS);
+        }
+    }
+
+    // -------------------------
     // Merkle: activate allocation once
     // -------------------------
     /**
