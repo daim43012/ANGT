@@ -5,13 +5,8 @@ const PresaleVestingModule = buildModule("PresaleVestingModule", (m) => {
   const { token } = m.useModule(FlyANGTModule);
 
   const owner = m.getParameter("owner");
-  const merkleRoot = m.getParameter("merkleRoot");
 
-  const vesting = m.contract("Vesting", [
-    token,
-    merkleRoot,
-    owner,
-  ]);
+  const vesting = m.contract("Vesting", [token, owner]);
 
   return { token, vesting };
 });

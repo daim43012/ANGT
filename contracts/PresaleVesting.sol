@@ -2,176 +2,141 @@
 pragma solidity 0.8.28;
 
 /**
- * Vesting
+ * Vesting (multi-cohort, daily unlock, UTC-aligned)
  *
- * Hybrid vesting vault for presale & OTC allocations with PER-USER vesting clock.
+ * Each addInvestor / fundAndAddInvestor creates an INDEPENDENT vesting cohort
+ * for the recipient. Top-ups never modify or reset existing cohorts.
  *
- * Vesting:
- * - 3 years total, monthly discrete unlocks (36 steps) — ~2.78% per month.
- * - Month is defined as 30 days.
- * - Unlock is DISCRETE: month 0 => 0/36, month 1 => 1/36, ..., month 36 => 36/36.
+ * Per-cohort rules:
+ *   - 1080 days total (= 36 months × 30 days), linear daily unlock
+ *   - cohort.startMidnightUtc = floor(block.timestamp / 1 day) * 1 day
+ *     (today's UTC midnight at the moment of addition)
+ *   - vested(c) = c.amount * daysElapsed / 1080, capped at amount
+ *   - daysElapsed advances at 00:00 UTC for ALL cohorts simultaneously
  *
- * KEY: vesting clock starts when tokens are first credited to the user.
- *  - Merkle activation: vestingStartOf[user] = block.timestamp at activateMerkle.
- *  - First admin top-up:  vestingStartOf[user] = block.timestamp at addInvestor*.
- *  - Subsequent top-ups don't reset the clock — they just add to allocation.
- *  - This means an OTC investor added 5 months after TGE still waits 3 years
- *    from THEIR own start.
+ * Account-level views aggregate across all cohorts. claim() iterates all
+ * cohorts of msg.sender, pays out vested-but-unclaimed total, marks each.
  *
- * Adding more tokens to an existing user:
- *  - claimable = vested(totalAllocation, theirElapsed) - claimed
- *  - so part of newly added wei becomes claimable for already-elapsed months.
+ * No merkle path — all allocations are admin-driven via Safe / owner address.
  */
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Vesting is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    // -------------------------
+    // ===================================================================
     // Constants
-    // -------------------------
+    // ===================================================================
     uint256 public constant DECIMALS = 1e18;
-    uint256 public constant MONTH = 30 days;
-    uint256 public constant DURATION_MONTHS = 36;
-    uint256 public constant DURATION = DURATION_MONTHS * MONTH;
-
-    /// @notice Owner can sweep stuck tokens only after this delay from contract deploy.
+    uint256 public constant DURATION_DAYS = 1080;
+    /// @notice Owner can sweep stuck tokens only after this delay from deploy.
     uint256 public constant ADMIN_WITHDRAW_DELAY = 30 days;
 
-    // -------------------------
+    // ===================================================================
     // Storage
-    // -------------------------
+    // ===================================================================
     IERC20 public immutable token;
     uint64 public immutable deployedAt;
-
-    bytes32 public merkleRoot;
     bool public started;
-    bool public rootFrozen;
 
-    // Per-user vesting start (set on first allocation — merkle OR admin).
-    mapping(address => uint64) public vestingStartOf;
+    struct Cohort {
+        uint64 startMidnightUtc; // 00:00 UTC of the cohort's start day
+        uint128 amountWei;       // total cohort allocation
+        uint128 claimedWei;      // already claimed from this cohort
+    }
 
-    // Merkle allocation (one-time activation).
-    mapping(address => bool) public merkleActivated;
-    mapping(address => uint256) public merkleAllocationWei;
+    mapping(address => Cohort[]) private _cohortsOf;
 
-    // Admin-added allocation (additive).
-    mapping(address => uint256) public adminAllocationWei;
+    // Append-only registry of unique investor addresses for off-chain enumeration.
+    address[] private _investors;
+    mapping(address => bool) private _isInvestor;
 
-    // Total claimed by user.
-    mapping(address => uint256) public claimedWei;
-
-    // -------------------------
+    // ===================================================================
     // Events
-    // -------------------------
-    event MerkleRootSet(bytes32 root);
+    // ===================================================================
     event Started(uint64 at);
-    event RootFrozen(bytes32 root);
-
     event Funded(address indexed from, uint256 amountWei);
+    event InvestorAdded(
+        address indexed account,
+        uint256 indexed cohortIndex,
+        uint256 amountWei,
+        uint64 startMidnightUtc
+    );
+    event Claimed(address indexed account, uint256 amount);
+    event Swept(address indexed to, uint256 amount);
 
-    event MerkleActivated(address indexed account, uint256 totalWei, uint64 vestingStart);
-    event InvestorAdded(address indexed account, uint256 addedWei, uint64 vestingStart);
-
-    event Claimed(address indexed account, uint256 amountWei, uint256 totalClaimedWei);
-    event Swept(address indexed to, uint256 amountWei);
-
-    // -------------------------
+    // ===================================================================
     // Constructor
-    // -------------------------
-    constructor(
-        address tokenAddress,
-        bytes32 initialRoot,
-        address initialOwner
-    ) Ownable(initialOwner) {
-        require(tokenAddress != address(0), "token is zero");
+    // ===================================================================
+    constructor(address tokenAddress, address initialOwner) Ownable(initialOwner) {
+        require(tokenAddress != address(0), "token zero");
         token = IERC20(tokenAddress);
-        merkleRoot = initialRoot;
         deployedAt = uint64(block.timestamp);
     }
 
-    // -------------------------
-    // Admin: root & start
-    // -------------------------
-    function setMerkleRoot(bytes32 newRoot) external onlyOwner {
-        require(!rootFrozen, "root frozen");
-        merkleRoot = newRoot;
-        emit MerkleRootSet(newRoot);
-    }
-
-    /// @notice Open the contract for activations and claims. Freezes the merkle root.
+    // ===================================================================
+    // Admin: lifecycle
+    // ===================================================================
+    /// @notice Open the contract for claims. Idempotent.
     function start() external onlyOwner {
         if (started) return;
-        require(merkleRoot != bytes32(0), "root not set");
         started = true;
-        rootFrozen = true;
         emit Started(uint64(block.timestamp));
-        emit RootFrozen(merkleRoot);
     }
 
-    // -------------------------
-    // Admin: funding
-    // -------------------------
+    // ===================================================================
+    // Admin: funding (without allocation)
+    // ===================================================================
+    /// @notice Pull `amountWei` ANGT from owner without creating a cohort.
+    /// @dev Requires owner to have ERC20-approved this contract.
     function fund(uint256 amountWei) external onlyOwner {
         token.safeTransferFrom(msg.sender, address(this), amountWei);
         emit Funded(msg.sender, amountWei);
     }
 
-    // -------------------------
-    // Admin: add investors manually
-    // -------------------------
+    // ===================================================================
+    // Admin: add investor (no funding, just bookkeeping)
+    // ===================================================================
     function addInvestorWei(address account, uint256 amountWei) external onlyOwner {
-        _addInvestor(account, amountWei);
+        _addCohort(account, amountWei);
     }
 
     function addInvestorHuman(address account, uint256 amountTokens) external onlyOwner {
-        _addInvestor(account, amountTokens * DECIMALS);
+        _addCohort(account, amountTokens * DECIMALS);
     }
 
-    function addInvestorsWei(address[] calldata accounts, uint256[] calldata amountsWei) external onlyOwner {
+    function addInvestorsWei(
+        address[] calldata accounts,
+        uint256[] calldata amountsWei
+    ) external onlyOwner {
         require(accounts.length == amountsWei.length, "len mismatch");
         for (uint256 i = 0; i < accounts.length; i++) {
-            _addInvestor(accounts[i], amountsWei[i]);
+            _addCohort(accounts[i], amountsWei[i]);
         }
     }
 
-    function addInvestorsHuman(address[] calldata accounts, uint256[] calldata amountTokens) external onlyOwner {
+    function addInvestorsHuman(
+        address[] calldata accounts,
+        uint256[] calldata amountTokens
+    ) external onlyOwner {
         require(accounts.length == amountTokens.length, "len mismatch");
         for (uint256 i = 0; i < accounts.length; i++) {
-            _addInvestor(accounts[i], amountTokens[i] * DECIMALS);
+            _addCohort(accounts[i], amountTokens[i] * DECIMALS);
         }
     }
 
-    function _addInvestor(address account, uint256 amountWei) internal {
-        require(account != address(0), "zero addr");
-        require(amountWei > 0, "zero amount");
-        adminAllocationWei[account] += amountWei;
-
-        // Start the per-user clock if this is the user's first allocation.
-        uint64 start_ = vestingStartOf[account];
-        if (start_ == 0) {
-            start_ = uint64(block.timestamp);
-            vestingStartOf[account] = start_;
-        }
-
-        emit InvestorAdded(account, amountWei, start_);
-    }
-
-    // -------------------------
+    // ===================================================================
     // Admin: fund + add atomically (one tx for OTC sales)
-    // -------------------------
-    /// @notice Pull `amountWei` ANGT from owner (Safe) into this contract AND
-    ///         credit `account` via _addInvestor — in a single onlyOwner call.
-    /// @dev Requires the caller (owner) to have ERC20-approved this contract
-    ///      to spend `amountWei` (or more) of `token`.
+    // ===================================================================
+    /// @notice Pull tokens from owner AND create a fresh cohort for `account`.
+    /// @dev Requires owner to have ERC20-approved this contract for `amountWei`+.
     function fundAndAddInvestorWei(address account, uint256 amountWei) public onlyOwner {
         token.safeTransferFrom(msg.sender, address(this), amountWei);
-        _addInvestor(account, amountWei);
+        _addCohort(account, amountWei);
         emit Funded(msg.sender, amountWei);
     }
 
@@ -199,84 +164,126 @@ contract Vesting is Ownable, ReentrancyGuard {
         }
     }
 
-    // -------------------------
-    // Merkle: activate allocation once
-    // -------------------------
-    /**
-     * @notice Activate merkle allocation ONCE.
-     * @param totalAllocationAmountWei Total presale allocation (wei).
-     * @param proof Merkle proof.
-     *
-     * Leaf: keccak256(abi.encodePacked(address, totalAllocationAmountWei))
-     */
-    function activateMerkle(uint256 totalAllocationAmountWei, bytes32[] calldata proof) public {
-        require(started, "not started");
-        require(!merkleActivated[msg.sender], "already activated");
-        require(merkleRoot != bytes32(0), "root not set");
-        require(totalAllocationAmountWei > 0, "zero amount");
+    function _addCohort(address account, uint256 amountWei) internal {
+        require(account != address(0), "zero addr");
+        require(amountWei > 0, "zero amount");
+        require(amountWei <= type(uint128).max, "amount too large");
 
-        bytes32 leaf = keccak256(abi.encodePacked(msg.sender, totalAllocationAmountWei));
-        require(MerkleProof.verify(proof, merkleRoot, leaf), "invalid proof");
+        // Floor to today's UTC midnight.
+        uint64 startMidnight = uint64((block.timestamp / 1 days) * 1 days);
 
-        merkleActivated[msg.sender] = true;
-        merkleAllocationWei[msg.sender] = totalAllocationAmountWei;
+        _cohortsOf[account].push(
+            Cohort({
+                startMidnightUtc: startMidnight,
+                amountWei: uint128(amountWei),
+                claimedWei: 0
+            })
+        );
 
-        // Per-user vesting clock starts here if not started by an earlier admin add.
-        uint64 start_ = vestingStartOf[msg.sender];
-        if (start_ == 0) {
-            start_ = uint64(block.timestamp);
-            vestingStartOf[msg.sender] = start_;
+        if (!_isInvestor[account]) {
+            _isInvestor[account] = true;
+            _investors.push(account);
         }
 
-        emit MerkleActivated(msg.sender, totalAllocationAmountWei, start_);
+        emit InvestorAdded(
+            account,
+            _cohortsOf[account].length - 1,
+            amountWei,
+            startMidnight
+        );
     }
 
-    /// @notice Convenience: activate if needed and claim in one tx.
-    function activateAndClaim(uint256 totalAllocationAmountWei, bytes32[] calldata proof) external nonReentrant {
-        if (!merkleActivated[msg.sender]) {
-            activateMerkle(totalAllocationAmountWei, proof);
+    // ===================================================================
+    // Admin: sweep (recover stuck tokens, locked for 30 days post-deploy)
+    // ===================================================================
+    function sweep(address to, uint256 amountWei) external onlyOwner {
+        require(to != address(0), "zero addr");
+        require(
+            block.timestamp >= uint256(deployedAt) + ADMIN_WITHDRAW_DELAY,
+            "admin withdraw locked"
+        );
+        token.safeTransfer(to, amountWei);
+        emit Swept(to, amountWei);
+    }
+
+    // ===================================================================
+    // Math
+    // ===================================================================
+    function _vestedWeiOfCohort(Cohort memory c) internal view returns (uint256) {
+        if (block.timestamp < uint256(c.startMidnightUtc)) return 0;
+        uint256 elapsed = block.timestamp - uint256(c.startMidnightUtc);
+        uint256 d = elapsed / 1 days;
+        if (d >= DURATION_DAYS) return uint256(c.amountWei);
+        return (uint256(c.amountWei) * d) / DURATION_DAYS;
+    }
+
+    // ===================================================================
+    // Views: cohorts (positions)
+    // ===================================================================
+    function cohortCount(address account) external view returns (uint256) {
+        return _cohortsOf[account].length;
+    }
+
+    function cohortAt(address account, uint256 i) external view returns (Cohort memory) {
+        require(i < _cohortsOf[account].length, "index out of range");
+        return _cohortsOf[account][i];
+    }
+
+    /// @notice Returns ALL cohorts for `account`. May be expensive for large N — prefer cohortAt for paged UI.
+    function cohortsOf(address account) external view returns (Cohort[] memory) {
+        return _cohortsOf[account];
+    }
+
+    /// @notice Detailed per-cohort info for UI rendering.
+    function cohortInfoAt(address account, uint256 i)
+        external
+        view
+        returns (
+            uint64 startMidnightUtc,
+            uint256 amountWei,
+            uint256 claimedFromCohortWei,
+            uint256 vestedFromCohortWei,
+            uint256 claimableFromCohortWei,
+            uint256 daysElapsed
+        )
+    {
+        require(i < _cohortsOf[account].length, "index out of range");
+        Cohort memory c = _cohortsOf[account][i];
+        startMidnightUtc = c.startMidnightUtc;
+        amountWei = uint256(c.amountWei);
+        claimedFromCohortWei = uint256(c.claimedWei);
+        vestedFromCohortWei = _vestedWeiOfCohort(c);
+        claimableFromCohortWei = vestedFromCohortWei > claimedFromCohortWei
+            ? vestedFromCohortWei - claimedFromCohortWei
+            : 0;
+        if (block.timestamp >= uint256(c.startMidnightUtc)) {
+            uint256 d = (block.timestamp - uint256(c.startMidnightUtc)) / 1 days;
+            daysElapsed = d > DURATION_DAYS ? DURATION_DAYS : d;
         }
-        _claim(msg.sender);
     }
 
-    // -------------------------
-    // Vesting math (per-user clock, monthly discrete unlock)
-    // -------------------------
-    function totalAllocationWei(address account) public view returns (uint256) {
-        return merkleAllocationWei[account] + adminAllocationWei[account];
+    // ===================================================================
+    // Views: account-level totals (sum across cohorts)
+    // ===================================================================
+    function totalAllocationWei(address account) public view returns (uint256 sum) {
+        Cohort[] storage cs = _cohortsOf[account];
+        for (uint256 i = 0; i < cs.length; i++) sum += uint256(cs[i].amountWei);
     }
 
-    function monthsElapsedOf(address account) public view returns (uint256) {
-        uint64 start_ = vestingStartOf[account];
-        if (start_ == 0 || block.timestamp < start_) return 0;
-        uint256 elapsed = block.timestamp - uint256(start_);
-        uint256 m = elapsed / MONTH;
-        if (m > DURATION_MONTHS) return DURATION_MONTHS;
-        return m;
+    function vestedWei(address account) public view returns (uint256 sum) {
+        Cohort[] storage cs = _cohortsOf[account];
+        for (uint256 i = 0; i < cs.length; i++) sum += _vestedWeiOfCohort(cs[i]);
     }
 
-    function vestedWei(address account) public view returns (uint256) {
-        uint256 total = totalAllocationWei(account);
-        uint256 m = monthsElapsedOf(account);
-        return (total * m) / DURATION_MONTHS;
+    function claimedWei(address account) public view returns (uint256 sum) {
+        Cohort[] storage cs = _cohortsOf[account];
+        for (uint256 i = 0; i < cs.length; i++) sum += uint256(cs[i].claimedWei);
     }
 
     function claimableWei(address account) public view returns (uint256) {
         uint256 v = vestedWei(account);
-        uint256 c = claimedWei[account];
-        if (v <= c) return 0;
-        return v - c;
-    }
-
-    function nextUnlockAt(address account) public view returns (uint256) {
-        uint64 start_ = vestingStartOf[account];
-        if (start_ == 0) return 0;
-        if (block.timestamp < start_) return uint256(start_) + MONTH;
-
-        uint256 m = monthsElapsedOf(account);
-        if (m >= DURATION_MONTHS) return 0;
-
-        return uint256(start_) + (m + 1) * MONTH;
+        uint256 c = claimedWei(account);
+        return v > c ? v - c : 0;
     }
 
     /// @notice One-call UI helper.
@@ -284,50 +291,75 @@ contract Vesting is Ownable, ReentrancyGuard {
         external
         view
         returns (
+            uint256 cohortsCount,
             uint256 totalWei,
             uint256 vestedNowWei,
             uint256 claimedSoFarWei,
-            uint256 claimableNowWei,
-            uint256 monthsElapsedNow,
-            uint64 vestingStart,
-            uint256 nextUnlockTimestamp
+            uint256 claimableNowWei
         )
     {
-        totalWei = totalAllocationWei(account);
-        monthsElapsedNow = monthsElapsedOf(account);
-        vestedNowWei = (totalWei * monthsElapsedNow) / DURATION_MONTHS;
-        claimedSoFarWei = claimedWei[account];
-        claimableNowWei = vestedNowWei > claimedSoFarWei ? (vestedNowWei - claimedSoFarWei) : 0;
-        vestingStart = vestingStartOf[account];
-        nextUnlockTimestamp = nextUnlockAt(account);
+        Cohort[] storage cs = _cohortsOf[account];
+        cohortsCount = cs.length;
+        for (uint256 i = 0; i < cs.length; i++) {
+            totalWei += uint256(cs[i].amountWei);
+            vestedNowWei += _vestedWeiOfCohort(cs[i]);
+            claimedSoFarWei += uint256(cs[i].claimedWei);
+        }
+        claimableNowWei = vestedNowWei > claimedSoFarWei
+            ? vestedNowWei - claimedSoFarWei
+            : 0;
     }
 
-    // -------------------------
-    // Claim
-    // -------------------------
+    // ===================================================================
+    // Views: investor registry (admin enumeration)
+    // ===================================================================
+    function investorCount() external view returns (uint256) {
+        return _investors.length;
+    }
+
+    function investorAt(uint256 i) external view returns (address) {
+        require(i < _investors.length, "index out of range");
+        return _investors[i];
+    }
+
+    function isInvestor(address account) external view returns (bool) {
+        return _isInvestor[account];
+    }
+
+    /// @notice Page through investors for off-chain enumeration without unbounded gas.
+    function investorsPaginated(uint256 offset, uint256 limit)
+        external
+        view
+        returns (address[] memory page)
+    {
+        uint256 n = _investors.length;
+        if (offset >= n) return new address[](0);
+        uint256 end = offset + limit;
+        if (end > n) end = n;
+        page = new address[](end - offset);
+        for (uint256 i = 0; i < page.length; i++) {
+            page[i] = _investors[offset + i];
+        }
+    }
+
+    // ===================================================================
+    // User: claim across all cohorts
+    // ===================================================================
     function claim() external nonReentrant {
         require(started, "not started");
-        _claim(msg.sender);
-    }
-
-    function _claim(address account) internal {
-        uint256 amt = claimableWei(account);
-        require(amt > 0, "nothing to claim");
-
-        claimedWei[account] += amt;
-        token.safeTransfer(account, amt);
-
-        emit Claimed(account, amt, claimedWei[account]);
-    }
-
-    // -------------------------
-    // Admin: sweep stuck tokens
-    // -------------------------
-    /// @notice Withdraw tokens from contract. Locked for 30 days after deploy.
-    function sweep(address to, uint256 amountWei) external onlyOwner {
-        require(to != address(0), "zero addr");
-        require(block.timestamp >= uint256(deployedAt) + ADMIN_WITHDRAW_DELAY, "admin withdraw locked");
-        token.safeTransfer(to, amountWei);
-        emit Swept(to, amountWei);
+        Cohort[] storage cs = _cohortsOf[msg.sender];
+        uint256 total = 0;
+        for (uint256 i = 0; i < cs.length; i++) {
+            uint256 vested = _vestedWeiOfCohort(cs[i]);
+            uint256 already = uint256(cs[i].claimedWei);
+            if (vested > already) {
+                uint256 due = vested - already;
+                cs[i].claimedWei = uint128(already + due);
+                total += due;
+            }
+        }
+        require(total > 0, "nothing to claim");
+        token.safeTransfer(msg.sender, total);
+        emit Claimed(msg.sender, total);
     }
 }

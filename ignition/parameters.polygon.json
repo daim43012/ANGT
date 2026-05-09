@@ -9,8 +9,7 @@
     "endTime": 0
   },
   "PresaleVestingModule": {
-    "owner": "0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A",
-    "merkleRoot": "0x22e849df8e7fc8773e9eb3981198d6983a11786455edc788ee63be74f0e23e54"
+    "owner": "0xBBC7Ee82284416aaA9C3e6d9C73d7D1f7752490A"
   },
   "AllocationRegistryModule": {
     "totalSupplyWei": "500000000000000000000000000",
